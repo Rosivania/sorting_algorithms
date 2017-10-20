@@ -1,0 +1,236 @@
+#include "insertion.h"
+
+clock_t tempoInicio, tempoFim;
+FILE *gnuplot;
+unsigned long  troca=0,comparacao=0;
+unsigned size;
+
+/*void insertionSort(int array[], unsigned lenght)
+{
+    unsigned i, j;
+    int eleito;
+    troca = 0;
+    comparacao = 0;
+
+    tempoInicio = clock();
+    for (i = 1; i < lenght; i++)
+    {
+        eleito = array[i];
+        j = i - 1;
+        for (j; (j >= 0) && (array[j] > eleito); j--, comparacao++)
+        {
+            array[j + 1] = array[j];
+            troca++;
+        }
+        array[j + 1] = eleito;
+    }
+    tempoFim = clock();
+}
+*/
+
+void  insertionSort(int array[], unsigned lenght)
+{
+    int i, j;
+    int atual;
+    troca = 0;
+    comparacao = 0;
+
+    tempoInicio = clock();
+    for(i = 1; i < lenght; i++)
+    {
+        atual = array[i];
+        j = i - 1;
+
+        //for(i;(i >= 0) && (vet[i] > atual);i--,comparacao++)
+        comparacao++;
+        while((j >= 0) && (array[j] > atual))
+        {
+            comparacao++;
+            array[j + 1] = array[j];
+            troca++;
+            j--;
+        }
+        array[j + 1] = atual;
+        troca++;
+    }
+    tempoFim = clock();
+}
+
+void print(int v[], unsigned size)
+{
+	unsigned i;
+	for(i = 0; i < size; i++)
+	{
+		printf("   %d", v[i]);
+	}
+	puts(" ");
+
+}
+
+///----------------------------------------------------------------------------------------
+void printResultados(){
+    //grava os resultados de comparações, trocas e tempo de cpu em um arquivo.
+    fprintf( gnuplot," %d\t\t", size);
+    fprintf( gnuplot," %f\t", (float)(tempoFim - tempoInicio)/CLOCKS_PER_SEC);
+    fprintf( gnuplot, "%ld\t\t",comparacao);
+    fprintf( gnuplot, "%ld\n", troca);
+
+    //mostas as trocas e compraçoes no console
+     printf("comparacao: %ld\n Trocas %ld\n",comparacao,troca);
+     printf("Tempo: %f\n", (float)(tempoFim - tempoInicio)/CLOCKS_PER_SEC);
+}
+
+///----------------------------------------------------------------------------------------
+void GravarArquivo(int vetor[], unsigned tamanho)
+{//Essa função grava o vetor ordenando em um arquivo txt
+
+    unsigned i;
+    FILE *gravar;
+    char Nome_arquivo[200];
+
+    sprintf(Nome_arquivo, "Vetor-%d-Ordenado.txt", tamanho);
+
+    gravar = fopen(Nome_arquivo,"w");
+    for (i = 0; i < tamanho; i++)
+    {
+        fprintf( gravar," %d ", vetor[i]);
+        fflush(gravar);
+    }
+    fclose(gravar);
+    printf("\n");
+}
+
+
+int main()
+{
+	int *vectorFile;
+printf("|================================================================|\n");
+printf("-------------------------Vetores randomicos -----------------------\n");
+
+    gnuplot = fopen("reports/Insert-sort-rond.dat", "w");
+
+
+    size=100;
+    printf("Ordenando vetor com 100 elementos\n");
+    fprintf(gnuplot, "#RANDOMICOS\n#Tamanho\t Tempo\t\t Comparacao\t trocas\n");
+    vectorFile = load_file("vectors/N100.txt",size);
+    insertionSort(vectorFile, size);
+    GravarArquivo(vectorFile, size);
+    printResultados();
+    ///-----------------------------------------------------------------------
+    /*size=1000;
+    printf("Ordenando vetor com 1.000 elementos\n");
+    vectorFile = load_file("vectors/N1000.txt",size);
+    insertionSort(vectorFile, size);
+    GravarArquivo(vectorFile, size);
+    printResultados();*/
+    ///------------------------------------------------------------------------
+    size=10000;
+    printf("Ordenando vetor com 10.000 elementos\n");
+    vectorFile = load_file("vectors/N10000.txt",size);
+    insertionSort(vectorFile, size);
+    GravarArquivo(vectorFile, size);
+    printResultados();
+    ///------------------------------------------------------------------------
+    size=50000;
+    printf("Ordenando vetor de 50.000 elementos\n");
+    vectorFile = load_file("vectors/N50000.txt",size);
+    insertionSort(vectorFile, size);
+    GravarArquivo(vectorFile, size);
+    printResultados();
+    ///------------------------------------------------------------------------
+    size=100000;
+    printf("Ordenando vetor de 100.000 elementos \n");
+    vectorFile = load_file("vectors/N100000.txt",size);
+    insertionSort(vectorFile, size);
+    GravarArquivo(vectorFile, size);
+    printResultados();
+    fclose(gnuplot);
+    ///-----------------------------------------------------------------------
+    printf("|================================================================|\n");
+    printf("-------------------------Vetores ordenados -----------------------\n");
+    size=100;
+    gnuplot = fopen("reports/Insert-sort-ord.dat", "w");
+
+    printf("Vetor ja ordenado com 100\n");
+    fprintf(gnuplot, "#ORDENADOS\n#Tamanho\t Tempo\t\t Comparacao\t trocas\n");
+    vectorFile = load_file("vectors/N100-ordenado.txt",size);
+    insertionSort(vectorFile, size);
+    GravarArquivo(vectorFile, size);
+    printResultados();
+    ///-----------------------------------------------------------------------
+    /*size=1000;
+    printf("Vetor ja ordenado com 1.000\n");
+    vectorFile = load_file("vectors/N1000-ordenado.txt",size);
+    insertionSort(vectorFile, size);
+    GravarArquivo(vectorFile, size);
+    printResultados();
+    *////------------------------------------------------------------------------
+    size=10000;
+    printf("Vetor ja ordenado com 10.000\n");
+    vectorFile = load_file("vectors/N10000-ordenado.txt",size);
+    insertionSort(vectorFile, size);
+    GravarArquivo(vectorFile, size);
+    printResultados();
+    ///------------------------------------------------------------------------
+    size=50000;
+    printf("Vetor ja ordenado com 50.000\n");
+    vectorFile = load_file("vectors/N50000-ordenado.txt",size);
+    insertionSort(vectorFile, size);
+    GravarArquivo(vectorFile, size);
+    printResultados();
+    ///------------------------------------------------------------------------
+    size=100000;
+    printf("Vetor ja ordenado com 100.000\n");
+    vectorFile = load_file("vectors/N100000-ordenado.txt",size);
+    insertionSort(vectorFile, size);
+    GravarArquivo(vectorFile, size);
+    printResultados();
+    fclose(gnuplot);
+    ///-----------------------------------------------------------------------
+     printf("|================================================================|\n");
+     printf("------------------Vetores inversamente ordenados------------------\n");
+
+     size=100;
+    gnuplot = fopen("reports/Insert-sort-inv.dat", "w");
+    printf("ordenando vetor inverso com 100 elementos\n");
+    fprintf(gnuplot, "#INVERSO\n#Tamanho\t Tempo\t\t Comparacao\t trocas\n");
+    vectorFile = load_file("vectors/N100-inverso.txt",size);
+    insertionSort(vectorFile, size);
+    GravarArquivo(vectorFile, size);
+    printResultados();
+    ///-----------------------------------------------------------------------
+    /*size=1000;
+    printf("Vetor ordenando inverso com 1.000\n");
+    vectorFile = load_file("vectors/N1000-inverso.txt",size);
+    insertionSort(vectorFile, size);
+    GravarArquivo(vectorFile, size);
+    printResultados();
+    *////------------------------------------------------------------------------
+    size=10000;
+    printf("Vetor ordenando inverso com 10.000\n");
+    vectorFile = load_file("vectors/N10000-inverso.txt",size);
+    insertionSort(vectorFile, size);
+    GravarArquivo(vectorFile, size);
+    printResultados();
+    ///------------------------------------------------------------------------
+    size=50000;
+    printf("Vetor ordenando inverso com 50.000\n");
+    vectorFile = load_file("vectors/N50000-inverso.txt",size);
+    insertionSort(vectorFile, size);
+    GravarArquivo(vectorFile, size);
+    printResultados();
+    ///------------------------------------------------------------------------
+    size=100000;
+    printf("Vetor ordenando inverso com 100.000\n");
+    vectorFile = load_file("vectors/N100000-inverso.txt",size);
+    insertionSort(vectorFile, size);
+    GravarArquivo(vectorFile, size);
+    printResultados();
+    fclose(gnuplot);
+    ///-----------------------------------------------------------------------
+
+    system("gnuplot -bg gray90 gnuplot_script/plota3.gnu");
+
+	return 0;
+}
